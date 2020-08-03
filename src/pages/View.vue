@@ -1,16 +1,16 @@
 <template>
     <div class="view">
-        <div class="deleteWarning" v-show="openWarning">
+        <div class="deleteWarning" v-show="warning">
             <h3>Are you sure you want to delete the post?</h3>
             <div class="btns">
-                <button @click="closeWarning">Yes</button>
-                <button @click="closeWarning">No</button>
+                <button @click="del(postId)">Yes</button>
+                <button @click="closeWarning()">No</button>
             </div>
         </div>
         <div class="filter">
             <form action="">
                 <input type="text" placeholder="Filter by type" v-model="filter">
-                <button @click="fil">Filter</button>
+                <button @click="fil()">Filter</button>
             </form>
         </div>
         <div class="list">
@@ -33,8 +33,8 @@
                     </label>
                 </div>
                 <div class="btns">
-                    <button @click="del">Delete</button>
-                    <button @click="update">Update</button>
+                    <button @click="openWarning(item.id)">Delete</button>
+                    <button @click="update(item.id)">Update</button>
                 </div>
             </div>
         </div>
@@ -47,19 +47,37 @@
         data() {
             return {
                 data_: [],
-                openWarning: false,
-                filter: ''
+                warning: false,
+                filter: '',
+                postId: ''
             }
         },
         methods: {
-            del() {
-                this.openWarning = true;
+            del(postId) {
+                fetch(
+                    `//localhost/vue-test-task/api/delete.php?id=${postId}`,
+                    {
+                        method: 'delete',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }
+                ).then(res => res.json()).then(res => {
+                    console.log(res);
+                    location.reload();
+                });
             },
-            update() {
+            update(id) {
+                console.log(id);
+                localStorage.setItem('id', id);
                 this.$router.push('/update');
             },
+            openWarning(id) {
+                this.warning = true;
+                this.postId = id;
+            },
             closeWarning() {
-                this.openWarning = false;
+                this.warning = false;
             },
             fil() {
                 fetch(

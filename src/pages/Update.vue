@@ -40,16 +40,71 @@
         name: 'Update',
         data() {
             return {
-                
+                title: '',
+                description: '',
+                type: '',
+                price: '',
+                country: '',
+                count: '',
+                postId: ''
             }
         },
         methods: {
             update() {
-
+                fetch(
+                    '//localhost/vue-test-task/api/update.php?id='+localStorage.getItem('id'),
+                    {
+                        method: 'put',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            title: this.title,
+                            description: this.description,
+                            type: this.type,
+                            price: this.price,
+                            country: this.country,
+                            count: this.count
+                        })
+                    }
+                ).then(res => res.json()).then(res => {
+                    console.log(res);   
+                    if(res && res.res) {
+                        this.title = '',
+                        this.description = '',
+                        this.type = '',
+                        this.price = '',
+                        this.country = '',
+                        this.count = '',
+                        this.$router.push('/view')
+                    }
+                }).catch(err => {
+                    console.log(err);
+                });
             },
             view() {
                 this.$router.push('/view');
             }
+        },
+        mounted() {
+            fetch(
+                '//localhost/vue-test-task/api/posts.php?id='+localStorage.getItem('id'), 
+                {
+                    method: 'get',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            ).then(res => res.json()).then(res => {
+                console.log(res);
+
+                this.title = res.posts.title;
+                this.description = res.posts.description;
+                this.type = res.posts.type;
+                this.price = res.posts.price;
+                this.country = res.posts.country;
+                this.count = res.posts.count;
+            });
         }
     }
 </script>
